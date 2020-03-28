@@ -65,7 +65,6 @@ static void secp256k1_scalar_inverse(secp256k1_scalar *r, const secp256k1_scalar
     /* If this VERIFY_CHECK triggers we were given a noninvertible scalar (and thus
      * have a composite group order; fix it in exhaustive_tests.c). */
     VERIFY_CHECK(*r != 0);
-}
 #else
     secp256k1_scalar *t;
     int i;
@@ -218,12 +217,8 @@ static void secp256k1_scalar_inverse(secp256k1_scalar *r, const secp256k1_scalar
         secp256k1_scalar_sqr(t, t);
     }
     secp256k1_scalar_mul(r, t, &x6); /* 111111 */
-}
-
-SECP256K1_INLINE static int secp256k1_scalar_is_even(const secp256k1_scalar *a) {
-    return !(a->d[0] & 1);
-}
 #endif
+}
 
 static void secp256k1_scalar_inverse_var(secp256k1_scalar *r, const secp256k1_scalar *x) {
 #if defined(USE_SCALAR_INV_BUILTIN)
@@ -245,6 +240,12 @@ static void secp256k1_scalar_inverse_var(secp256k1_scalar *r, const secp256k1_sc
 #error "Please select scalar inverse implementation"
 #endif
 }
+
+#if !defined(EXHAUSTIVE_TEST_ORDER)
+SECP256K1_INLINE static int secp256k1_scalar_is_even(const secp256k1_scalar *a) {
+    return !(a->d[0] & 1);
+}
+#endif
 
 #ifdef USE_ENDOMORPHISM
 #if defined(EXHAUSTIVE_TEST_ORDER)
